@@ -5,12 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Temperature Converter</title>
     <style>
+        :root {
+            --bg-gradient-1: #667eea;
+            --bg-gradient-2: #764ba2;
+            --bg-gradient-3: #f093fb;
+            --container-bg: rgba(255, 255, 255, 0.95);
+            --text-primary: #2c3e50;
+            --text-secondary: #666;
+            --input-bg: white;
+            --input-border: #e0e0e0;
+            --border-color: #e0e0e0;
+            --card-bg: #f8f9fa;
+        }
+
+        body.dark-mode {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --bg-gradient-3: #0f3460;
+            --container-bg: rgba(30, 30, 46, 0.95);
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --input-bg: #2a2a3e;
+            --input-border: #404052;
+            --border-color: #404052;
+            --card-bg: #2a2a3e;
+        }
+
         * {
             box-sizing: border-box;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -19,6 +45,7 @@
             padding: 15px;
             animation: gradientShift 10s ease infinite;
             background-size: 200% 200%;
+            transition: background 0.5s ease;
         }
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
@@ -26,7 +53,7 @@
             100% { background-position: 0% 50%; }
         }
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--container-bg);
             backdrop-filter: blur(10px);
             border-radius: 25px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -34,6 +61,8 @@
             width: 100%;
             max-width: 550px;
             animation: fadeIn 0.5s ease-out;
+            position: relative;
+            transition: background 0.3s ease;
         }
         @keyframes fadeIn {
             from {
@@ -44,6 +73,28 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        .dark-mode-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
         h1 {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -64,22 +115,24 @@
         }
         label {
             font-weight: 600;
-            color: #2c3e50;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             font-size: 1rem;
+            transition: color 0.3s ease;
         }
         .input-wrapper {
             position: relative;
         }
         input {
             padding: 15px 20px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--input-border);
             border-radius: 12px;
             font-size: 18px;
             transition: all 0.3s;
             width: 100%;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
             min-height: 48px;
             -webkit-appearance: none;
         }
@@ -239,12 +292,41 @@
         .formula-box {
             margin-top: 15px;
             padding: 12px;
-            background: #f8f9fa;
+            background: var(--card-bg);
             border-radius: 10px;
             font-size: 0.85rem;
-            color: #555;
+            color: var(--text-secondary);
             text-align: center;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .temp-reference {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: slideIn 0.5s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+        .temp-reference .emoji {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .temp-reference .message {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .temp-reference .detail {
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
         .error-message {
             color: #e74c3c;
@@ -260,10 +342,11 @@
             text-align: center;
             margin-top: 25px;
             padding: 15px 0 5px 0;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             font-weight: 500;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
         footer .heart {
             color: #ff6b6b;
@@ -383,6 +466,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">🌙</button>
         <h1>🌡️ Temperature Converter</h1>
         <div class="input-group">
             <label for="temperature">Enter Temperature:</label>
@@ -443,6 +527,12 @@
             <span id="formulaText"></span>
         </div>
 
+        <div class="temp-reference hidden" id="tempReference">
+            <span class="emoji" id="refEmoji">🌡️</span>
+            <div class="message" id="refMessage">Temperature Reference</div>
+            <div class="detail" id="refDetail">Context will appear here</div>
+        </div>
+
         <footer>
             Temperature Converter made with <span class="heart">❤️</span> by Aladdin
         </footer>
@@ -455,6 +545,61 @@
         const scaleIndicator = document.getElementById('scaleIndicator');
         const formulaBox = document.getElementById('formulaBox');
         const formulaText = document.getElementById('formulaText');
+        const tempReference = document.getElementById('tempReference');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+
+        // Dark mode functionality
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.textContent = '☀️';
+        }
+
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        // Temperature reference data
+        function getTemperatureReference(celsius) {
+            if (celsius <= -273.15) {
+                return { emoji: '🥶', message: 'Absolute Zero!', detail: 'The coldest temperature possible in the universe', gradient: 'linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%)' };
+            } else if (celsius < -40) {
+                return { emoji: '❄️', message: 'Extremely Cold!', detail: 'Colder than the coldest inhabited places on Earth', gradient: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' };
+            } else if (celsius >= -40 && celsius < -20) {
+                return { emoji: '🧊', message: 'Freezer Temperature', detail: 'Commercial freezers operate around this range', gradient: 'linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%)' };
+            } else if (celsius >= -20 && celsius < 0) {
+                return { emoji: '⛄', message: 'Below Freezing', detail: 'Cold enough to snow and freeze water', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' };
+            } else if (celsius === 0) {
+                return { emoji: '🧊', message: 'Water Freezing Point!', detail: 'The temperature at which water turns to ice', gradient: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)' };
+            } else if (celsius > 0 && celsius < 10) {
+                return { emoji: '🧥', message: 'Cold Weather', detail: 'Typical winter temperature, coat recommended', gradient: 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)' };
+            } else if (celsius >= 10 && celsius < 20) {
+                return { emoji: '🍃', message: 'Cool & Pleasant', detail: 'Perfect spring weather, light jacket weather', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' };
+            } else if (celsius >= 20 && celsius < 25) {
+                return { emoji: '🏠', message: 'Perfect Room Temperature!', detail: 'Ideal indoor comfort zone (20-22°C)', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' };
+            } else if (celsius >= 25 && celsius < 30) {
+                return { emoji: '☀️', message: 'Warm & Comfortable', detail: 'Great beach weather, sunscreen recommended', gradient: 'linear-gradient(135deg, #ffd89b 0%, #19547b 100%)' };
+            } else if (celsius >= 30 && celsius < 37) {
+                return { emoji: '🌞', message: 'Hot Summer Day', detail: 'Stay hydrated and find some shade!', gradient: 'linear-gradient(135deg, #f83600 0%, #f9d423 100%)' };
+            } else if (celsius >= 37 && celsius < 38) {
+                return { emoji: '🌡️', message: 'Human Body Temperature!', detail: 'Normal body temperature is around 37°C (98.6°F)', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' };
+            } else if (celsius >= 38 && celsius < 50) {
+                return { emoji: '🥵', message: 'Very Hot!', detail: 'Dangerous heat - risk of heat exhaustion', gradient: 'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)' };
+            } else if (celsius >= 50 && celsius < 100) {
+                return { emoji: '🔥', message: 'Extreme Heat!', detail: 'Hotter than the hottest deserts on Earth', gradient: 'linear-gradient(135deg, #e53935 0%, #e35d5b 100%)' };
+            } else if (celsius === 100) {
+                return { emoji: '💧', message: 'Water Boiling Point!', detail: 'The temperature at which water turns to steam', gradient: 'linear-gradient(135deg, #f12711 0%, #f5af19 100%)' };
+            } else if (celsius > 100 && celsius < 200) {
+                return { emoji: '♨️', message: 'Superheated Steam!', detail: 'Hot enough to cook food instantly', gradient: 'linear-gradient(135deg, #c31432 0%, #240b36 100%)' };
+            } else {
+                return { emoji: '🌋', message: 'Volcanic Temperatures!', detail: 'Hotter than molten lava!', gradient: 'linear-gradient(135deg, #ff0000 0%, #8b0000 100%)' };
+            }
+        }
 
         // Conversion functions
         function celsiusToFahrenheit(c) {
@@ -535,6 +680,7 @@
                 resultsContainer.classList.add('hidden');
                 scaleIndicator.classList.add('hidden');
                 formulaBox.classList.add('hidden');
+                tempReference.classList.add('hidden');
                 return;
             }
 
@@ -542,6 +688,14 @@
             document.getElementById('celsiusValue').textContent = celsius.toFixed(2);
             document.getElementById('fahrenheitValue').textContent = fahrenheit.toFixed(2);
             document.getElementById('kelvinValue').textContent = kelvin.toFixed(2);
+
+            // Update temperature reference
+            const reference = getTemperatureReference(celsius);
+            document.getElementById('refEmoji').textContent = reference.emoji;
+            document.getElementById('refMessage').textContent = reference.message;
+            document.getElementById('refDetail').textContent = reference.detail;
+            tempReference.style.background = reference.gradient;
+            tempReference.classList.remove('hidden');
 
             // Update scale marker (position based on Celsius, scaled from -40 to 40)
             const markerPosition = ((celsius + 40) / 80) * 100;
@@ -571,6 +725,7 @@
             resultsContainer.classList.add('hidden');
             scaleIndicator.classList.add('hidden');
             formulaBox.classList.add('hidden');
+            tempReference.classList.add('hidden');
             tempInput.focus();
         });
 
