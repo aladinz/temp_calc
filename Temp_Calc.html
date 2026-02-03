@@ -394,6 +394,107 @@
             font-size: 0.9rem;
             line-height: 1.5;
         }
+        .history-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: slideIn 0.5s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .history-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .history-clear-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .history-clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .history-clear-btn:active {
+            transform: translateY(0);
+        }
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: var(--input-bg);
+            border-radius: 3px;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: #667eea;
+        }
+        .history-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left-color: #764ba2;
+        }
+        .history-conversion {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .history-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+        .history-empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .history-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
         .error-message {
             color: #e74c3c;
             font-size: 0.9rem;
@@ -623,6 +724,21 @@
             <div class="fact-text" id="funFactText">Temperature facts will appear here</div>
         </div>
 
+        <div class="history-panel hidden" id="historyPanel">
+            <div class="history-header">
+                <div class="history-title">
+                    <span>📜</span> Conversion History
+                </div>
+                <button class="history-clear-btn" id="clearHistory">🗑️ Clear All</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">
+                    <div class="history-empty-icon">📋</div>
+                    <div>No conversions yet. Start converting temperatures!</div>
+                </div>
+            </div>
+        </div>
+
         <footer>
             Temperature Converter made with <span class="heart">❤️</span> by Aladdin
         </footer>
@@ -639,6 +755,121 @@
         const darkModeToggle = document.getElementById('darkModeToggle');
         const funFactBox = document.getElementById('funFactBox');
         const funFactText = document.getElementById('funFactText');
+        const historyPanel = document.getElementById('historyPanel');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+
+        // Temperature history array
+        let conversionHistory = [];
+
+        // Load history from localStorage
+        function loadHistory() {
+            const saved = localStorage.getItem('conversionHistory');
+            if (saved) {
+                conversionHistory = JSON.parse(saved);
+                displayHistory();
+            }
+        }
+
+        // Save history to localStorage
+        function saveHistory() {
+            localStorage.setItem('conversionHistory', JSON.stringify(conversionHistory));
+        }
+
+        // Add conversion to history
+        function addToHistory(celsius, fahrenheit, unit) {
+            const timestamp = new Date();
+            const entry = {
+                celsius: celsius.toFixed(2),
+                fahrenheit: fahrenheit.toFixed(2),
+                inputUnit: unit,
+                timestamp: timestamp.toISOString(),
+                displayTime: formatTimestamp(timestamp)
+            };
+            
+            // Add to beginning of array (most recent first)
+            conversionHistory.unshift(entry);
+            
+            // Keep only last 20 conversions
+            if (conversionHistory.length > 20) {
+                conversionHistory = conversionHistory.slice(0, 20);
+            }
+            
+            saveHistory();
+            displayHistory();
+        }
+
+        // Format timestamp
+        function formatTimestamp(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000); // seconds
+            
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+            if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+            
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Display history
+        function displayHistory() {
+            if (conversionHistory.length === 0) {
+                historyList.innerHTML = `
+                    <div class="history-empty">
+                        <div class="history-empty-icon">📋</div>
+                        <div>No conversions yet. Start converting temperatures!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyPanel.classList.remove('hidden');
+            
+            historyList.innerHTML = conversionHistory.map((entry, index) => {
+                const arrow = entry.inputUnit === 'celsius' ? '→' : '←';
+                const conversion = entry.inputUnit === 'celsius' 
+                    ? `${entry.celsius}°C ${arrow} ${entry.fahrenheit}°F`
+                    : `${entry.fahrenheit}°F ${arrow} ${entry.celsius}°C`;
+                
+                return `
+                    <div class="history-item" data-index="${index}">
+                        <div class="history-conversion">${conversion}</div>
+                        <div class="history-timestamp">${entry.displayTime}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers to reuse conversions
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const entry = conversionHistory[index];
+                    
+                    // Set input value
+                    if (entry.inputUnit === 'celsius') {
+                        tempInput.value = entry.celsius;
+                        document.querySelector('[data-unit="celsius"]').click();
+                    } else {
+                        tempInput.value = entry.fahrenheit;
+                        document.querySelector('[data-unit="fahrenheit"]').click();
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        }
+
+        // Clear history
+        clearHistoryBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all conversion history?')) {
+                conversionHistory = [];
+                saveHistory();
+                displayHistory();
+                historyPanel.classList.add('hidden');
+            }
+        });
 
         // Dark mode functionality
         function toggleDarkMode() {
@@ -655,6 +886,9 @@
         }
 
         darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        // Load conversion history on page load
+        loadHistory();
 
         // Update scale landmarks based on unit
         function updateScaleLandmarks(unit) {
@@ -853,6 +1087,9 @@
             // Show a random fun fact
             funFactText.textContent = getRandomFunFact();
             funFactBox.classList.remove('hidden');
+
+            // Add to history
+            addToHistory(celsius, fahrenheit, unit);
 
             // Re-trigger animations
             resultsContainer.querySelectorAll('.result-card').forEach((card, index) => {
