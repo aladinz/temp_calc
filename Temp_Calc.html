@@ -579,29 +579,29 @@
         </div>
 
         <div class="scale-indicator hidden" id="scaleIndicator">
-            <div class="scale-title">Temperature Scale with Key Landmarks (°C)</div>
+            <div class="scale-title" id="scaleTitle">Temperature Scale with Key Landmarks (°C)</div>
             <div class="scale-bar">
                 <div class="scale-marker" id="scaleMarker"></div>
                 <!-- Temperature Landmarks -->
-                <div class="landmark" style="left: 50%;" title="Water Freezing Point">
+                <div class="landmark" id="landmark1" style="left: 50%;" title="Water Freezing Point">
                     <div class="landmark-icon">🧊</div>
                     <div class="landmark-marker"></div>
-                    <div class="landmark-label">0°C</div>
+                    <div class="landmark-label" id="landmarkLabel1">0°C</div>
                 </div>
-                <div class="landmark" style="left: 75%;" title="Room Temperature">
+                <div class="landmark" id="landmark2" style="left: 75%;" title="Room Temperature">
                     <div class="landmark-icon">🏠</div>
                     <div class="landmark-marker"></div>
-                    <div class="landmark-label">20°C</div>
+                    <div class="landmark-label" id="landmarkLabel2">20°C</div>
                 </div>
-                <div class="landmark" style="left: 96.25%;" title="Human Body Temperature">
+                <div class="landmark" id="landmark3" style="left: 96.25%;" title="Human Body Temperature">
                     <div class="landmark-icon">🌡️</div>
                     <div class="landmark-marker"></div>
-                    <div class="landmark-label">37°C</div>
+                    <div class="landmark-label" id="landmarkLabel3">37°C</div>
                 </div>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-top: 65px;">
-                <span>-40°C</span>
-                <span>100°C Boil 💧</span>
+                <span id="scaleMin">-40°C</span>
+                <span id="scaleMax">100°C Boil 💧</span>
             </div>
         </div>
 
@@ -655,6 +655,54 @@
         }
 
         darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        // Update scale landmarks based on unit
+        function updateScaleLandmarks(unit) {
+            const scaleTitle = document.getElementById('scaleTitle');
+            const scaleMin = document.getElementById('scaleMin');
+            const scaleMax = document.getElementById('scaleMax');
+            const landmark1 = document.getElementById('landmark1');
+            const landmark2 = document.getElementById('landmark2');
+            const landmark3 = document.getElementById('landmark3');
+            const landmarkLabel1 = document.getElementById('landmarkLabel1');
+            const landmarkLabel2 = document.getElementById('landmarkLabel2');
+            const landmarkLabel3 = document.getElementById('landmarkLabel3');
+
+            if (unit === 'celsius') {
+                scaleTitle.textContent = 'Temperature Scale with Key Landmarks (°C)';
+                scaleMin.textContent = '-40°C';
+                scaleMax.textContent = '100°C Boil 💧';
+                
+                // Landmarks: 0°C (50%), 20°C (75%), 37°C (96.25%)
+                landmark1.style.left = '50%';
+                landmarkLabel1.textContent = '0°C';
+                
+                landmark2.style.left = '75%';
+                landmarkLabel2.textContent = '20°C';
+                
+                landmark3.style.left = '96.25%';
+                landmarkLabel3.textContent = '37°C';
+            } else {
+                scaleTitle.textContent = 'Temperature Scale with Key Landmarks (°F)';
+                scaleMin.textContent = '-40°F';
+                scaleMax.textContent = '212°F Boil 💧';
+                
+                // Convert landmarks to Fahrenheit positions
+                // Scale range: -40°F to 212°F (252 degree span)
+                // 32°F (water freezing) = ((32 - (-40)) / 252) * 100 = 28.57%
+                // 68°F (room temp) = ((68 - (-40)) / 252) * 100 = 42.86%
+                // 98.6°F (body temp) = ((98.6 - (-40)) / 252) * 100 = 55%
+                
+                landmark1.style.left = '28.57%';
+                landmarkLabel1.textContent = '32°F';
+                
+                landmark2.style.left = '42.86%';
+                landmarkLabel2.textContent = '68°F';
+                
+                landmark3.style.left = '55%';
+                landmarkLabel3.textContent = '98.6°F';
+            }
+        }
 
         // Fun Facts Database
         const funFacts = [
@@ -782,8 +830,18 @@
             tempReference.style.background = reference.gradient;
             tempReference.classList.remove('hidden');
 
-            // Update scale marker (position based on Celsius, scaled from -40 to 40)
-            const markerPosition = ((celsius + 40) / 80) * 100;
+            // Update scale landmarks based on unit
+            updateScaleLandmarks(unit);
+
+            // Update scale marker position based on unit
+            let markerPosition;
+            if (unit === 'celsius') {
+                // Celsius scale: -40 to 100 (140 degree span)
+                markerPosition = ((celsius + 40) / 140) * 100;
+            } else {
+                // Fahrenheit scale: -40 to 212 (252 degree span)
+                markerPosition = ((fahrenheit + 40) / 252) * 100;
+            }
             const clampedPosition = Math.max(0, Math.min(100, markerPosition));
             document.getElementById('scaleMarker').style.left = clampedPosition + '%';
 
