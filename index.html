@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Temperature Converter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            animation: gradientShift 10s ease infinite;
+            background-size: 200% 200%;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 550px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        input {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 18px;
+            transition: all 0.3s;
+            width: 100%;
+            background: white;
+            min-height: 48px;
+            -webkit-appearance: none;
+        }
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        .unit-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .unit-option {
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            background: #f0f4ff;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #e0e7ff;
+            flex: 1;
+            text-align: center;
+            min-width: 80px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .unit-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .unit-option.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(-1px);
+        }
+        button.clear-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        button.clear-btn:hover {
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        .results-container {
+            margin-top: 25px;
+        }
+        .result-card {
+            margin-bottom: 12px;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease-out forwards;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .result-card.celsius {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation-delay: 0.1s;
+        }
+        .result-card.fahrenheit {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+            animation-delay: 0.2s;
+        }
+        .result-card.kelvin {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            animation-delay: 0.3s;
+        }
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .scale-indicator {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scale-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .scale-bar {
+            height: 30px;
+            background: linear-gradient(to right, #3498db, #2ecc71, #f39c12, #e74c3c);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .scale-marker {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 50px;
+            background: white;
+            border: 2px solid #2c3e50;
+            border-radius: 2px;
+            transition: left 0.5s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .formula-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #555;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .hidden {
+            display: none;
+        }
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px 0 5px 0;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-top: 1px solid #e0e0e0;
+        }
+        footer .heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            display: inline-block;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+            }
+            input {
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+            .unit-options {
+                gap: 8px;
+            }
+            .unit-option {
+                font-size: 13px;
+                padding: 10px 15px;
+                min-width: auto;
+            }
+            .button-group {
+                gap: 8px;
+            }
+            button {
+                font-size: 15px;
+                padding: 14px;
+            }
+            .result-card {
+                padding: 15px;
+                font-size: 1rem;
+            }
+            .result-value {
+                font-size: 1.2rem;
+            }
+            .scale-indicator {
+                padding: 12px;
+            }
+            .formula-box {
+                font-size: 0.8rem;
+                padding: 10px;
+            }
+            footer {
+                font-size: 0.85rem;
+                padding: 12px 0 3px 0;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .unit-option {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+            .result-card {
+                padding: 12px;
+            }
+            .result-label {
+                font-size: 0.8rem;
+            }
+            .result-value {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+                margin: 10px 0;
+            }
+            h1 {
+                font-size: 1.6rem;
+                margin-bottom: 12px;
+            }
+            .input-group {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .result-card {
+                padding: 12px;
+                margin-bottom: 8px;
+            }
+            .scale-indicator {
+                margin-top: 15px;
+                padding: 10px;
+            }
+            footer {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌡️ Temperature Converter</h1>
+        <div class="input-group">
+            <label for="temperature">Enter Temperature:</label>
+            <div class="input-wrapper">
+                <input type="number" id="temperature" placeholder="e.g., 25" step="0.01" autofocus>
+            </div>
+            <label>Select Input Unit:</label>
+            <div class="unit-options">
+                <div class="unit-option active" data-unit="celsius">°C Celsius</div>
+                <div class="unit-option" data-unit="fahrenheit">°F Fahrenheit</div>
+                <div class="unit-option" data-unit="kelvin">K Kelvin</div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="calculate">🔄 Convert</button>
+            <button class="clear-btn" id="clear">🗑️ Clear</button>
+        </div>
+        <div id="error" class="error-message hidden"></div>
+        
+        <div class="results-container hidden" id="resultsContainer">
+            <div class="result-card celsius" id="celsiusResult">
+                <div>
+                    <div class="result-label">Celsius</div>
+                    <div class="result-value" id="celsiusValue">--</div>
+                </div>
+                <div style="font-size: 2rem;">°C</div>
+            </div>
+            <div class="result-card fahrenheit" id="fahrenheitResult">
+                <div>
+                    <div class="result-label">Fahrenheit</div>
+                    <div class="result-value" id="fahrenheitValue">--</div>
+                </div>
+                <div style="font-size: 2rem;">°F</div>
+            </div>
+            <div class="result-card kelvin" id="kelvinResult">
+                <div>
+                    <div class="result-label">Kelvin</div>
+                    <div class="result-value" id="kelvinValue">--</div>
+                </div>
+                <div style="font-size: 2rem;">K</div>
+            </div>
+        </div>
+
+        <div class="scale-indicator hidden" id="scaleIndicator">
+            <div class="scale-title">Temperature Scale (°C)</div>
+            <div class="scale-bar">
+                <div class="scale-marker" id="scaleMarker"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-top: 5px;">
+                <span>-40°C</span>
+                <span>0°C</span>
+                <span>40°C</span>
+            </div>
+        </div>
+
+        <div class="formula-box hidden" id="formulaBox">
+            <strong>Conversion Formulas:</strong><br>
+            <span id="formulaText"></span>
+        </div>
+
+        <footer>
+            Temperature Converter made with <span class="heart">❤️</span> by Aladdin
+        </footer>
+    </div>
+
+    <script>
+        const tempInput = document.getElementById('temperature');
+        const errorDiv = document.getElementById('error');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const scaleIndicator = document.getElementById('scaleIndicator');
+        const formulaBox = document.getElementById('formulaBox');
+        const formulaText = document.getElementById('formulaText');
+
+        // Conversion functions
+        function celsiusToFahrenheit(c) {
+            return (c * 9/5) + 32;
+        }
+
+        function celsiusToKelvin(c) {
+            return c + 273.15;
+        }
+
+        function fahrenheitToCelsius(f) {
+            return (f - 32) * 5/9;
+        }
+
+        function fahrenheitToKelvin(f) {
+            return (f - 32) * 5/9 + 273.15;
+        }
+
+        function kelvinToCelsius(k) {
+            return k - 273.15;
+        }
+
+        function kelvinToFahrenheit(k) {
+            return (k - 273.15) * 9/5 + 32;
+        }
+
+        function convertTemperature() {
+            const temp = parseFloat(tempInput.value);
+            const unit = document.querySelector('.unit-option.active').getAttribute('data-unit');
+            
+            // Clear error
+            errorDiv.classList.add('hidden');
+            
+            // Validate input
+            if (isNaN(temp) || tempInput.value.trim() === '') {
+                errorDiv.textContent = '⚠️ Please enter a valid temperature';
+                errorDiv.classList.remove('hidden');
+                resultsContainer.classList.add('hidden');
+                scaleIndicator.classList.add('hidden');
+                formulaBox.classList.add('hidden');
+                return;
+            }
+
+            // Validate Kelvin (cannot be negative)
+            if (unit === 'kelvin' && temp < 0) {
+                errorDiv.textContent = '⚠️ Kelvin cannot be negative (absolute zero = 0K)';
+                errorDiv.classList.remove('hidden');
+                resultsContainer.classList.add('hidden');
+                scaleIndicator.classList.add('hidden');
+                formulaBox.classList.add('hidden');
+                return;
+            }
+
+            // Convert to all units
+            let celsius, fahrenheit, kelvin;
+
+            if (unit === 'celsius') {
+                celsius = temp;
+                fahrenheit = celsiusToFahrenheit(temp);
+                kelvin = celsiusToKelvin(temp);
+                formulaText.innerHTML = '°F = (°C × 9/5) + 32 | K = °C + 273.15';
+            } else if (unit === 'fahrenheit') {
+                celsius = fahrenheitToCelsius(temp);
+                fahrenheit = temp;
+                kelvin = fahrenheitToKelvin(temp);
+                formulaText.innerHTML = '°C = (°F - 32) × 5/9 | K = (°F - 32) × 5/9 + 273.15';
+            } else if (unit === 'kelvin') {
+                celsius = kelvinToCelsius(temp);
+                fahrenheit = kelvinToFahrenheit(temp);
+                kelvin = temp;
+                formulaText.innerHTML = '°C = K - 273.15 | °F = (K - 273.15) × 9/5 + 32';
+            }
+
+            // Validate absolute zero
+            if (celsius < -273.15) {
+                errorDiv.textContent = '⚠️ Temperature below absolute zero (-273.15°C) is not possible';
+                errorDiv.classList.remove('hidden');
+                resultsContainer.classList.add('hidden');
+                scaleIndicator.classList.add('hidden');
+                formulaBox.classList.add('hidden');
+                return;
+            }
+
+            // Update results
+            document.getElementById('celsiusValue').textContent = celsius.toFixed(2);
+            document.getElementById('fahrenheitValue').textContent = fahrenheit.toFixed(2);
+            document.getElementById('kelvinValue').textContent = kelvin.toFixed(2);
+
+            // Update scale marker (position based on Celsius, scaled from -40 to 40)
+            const markerPosition = ((celsius + 40) / 80) * 100;
+            const clampedPosition = Math.max(0, Math.min(100, markerPosition));
+            document.getElementById('scaleMarker').style.left = clampedPosition + '%';
+
+            // Show results
+            resultsContainer.classList.remove('hidden');
+            scaleIndicator.classList.remove('hidden');
+            formulaBox.classList.remove('hidden');
+
+            // Re-trigger animations
+            resultsContainer.querySelectorAll('.result-card').forEach((card, index) => {
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 10);
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('calculate').addEventListener('click', convertTemperature);
+
+        document.getElementById('clear').addEventListener('click', function() {
+            tempInput.value = '';
+            errorDiv.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            scaleIndicator.classList.add('hidden');
+            formulaBox.classList.add('hidden');
+            tempInput.focus();
+        });
+
+        // Real-time conversion on input
+        tempInput.addEventListener('input', function() {
+            if (tempInput.value.trim() !== '') {
+                convertTemperature();
+            }
+        });
+
+        // Unit switching functionality
+        document.querySelectorAll('.unit-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.unit-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Reconvert if there's a value
+                if (tempInput.value.trim() !== '') {
+                    convertTemperature();
+                }
+            });
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                convertTemperature();
+            } else if (e.key === 'Escape') {
+                document.getElementById('clear').click();
+            }
+        });
+    </script>
+</body>
+</html>
