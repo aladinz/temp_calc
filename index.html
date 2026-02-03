@@ -477,7 +477,6 @@
             <div class="unit-options">
                 <div class="unit-option active" data-unit="celsius">°C Celsius</div>
                 <div class="unit-option" data-unit="fahrenheit">°F Fahrenheit</div>
-                <div class="unit-option" data-unit="kelvin">K Kelvin</div>
             </div>
         </div>
         <div class="button-group">
@@ -500,13 +499,6 @@
                     <div class="result-value" id="fahrenheitValue">--</div>
                 </div>
                 <div style="font-size: 2rem;">°F</div>
-            </div>
-            <div class="result-card kelvin" id="kelvinResult">
-                <div>
-                    <div class="result-label">Kelvin</div>
-                    <div class="result-value" id="kelvinValue">--</div>
-                </div>
-                <div style="font-size: 2rem;">K</div>
             </div>
         </div>
 
@@ -606,24 +598,8 @@
             return (c * 9/5) + 32;
         }
 
-        function celsiusToKelvin(c) {
-            return c + 273.15;
-        }
-
         function fahrenheitToCelsius(f) {
             return (f - 32) * 5/9;
-        }
-
-        function fahrenheitToKelvin(f) {
-            return (f - 32) * 5/9 + 273.15;
-        }
-
-        function kelvinToCelsius(k) {
-            return k - 273.15;
-        }
-
-        function kelvinToFahrenheit(k) {
-            return (k - 273.15) * 9/5 + 32;
         }
 
         function convertTemperature() {
@@ -643,34 +619,17 @@
                 return;
             }
 
-            // Validate Kelvin (cannot be negative)
-            if (unit === 'kelvin' && temp < 0) {
-                errorDiv.textContent = '⚠️ Kelvin cannot be negative (absolute zero = 0K)';
-                errorDiv.classList.remove('hidden');
-                resultsContainer.classList.add('hidden');
-                scaleIndicator.classList.add('hidden');
-                formulaBox.classList.add('hidden');
-                return;
-            }
-
-            // Convert to all units
-            let celsius, fahrenheit, kelvin;
+            // Convert between units
+            let celsius, fahrenheit;
 
             if (unit === 'celsius') {
                 celsius = temp;
                 fahrenheit = celsiusToFahrenheit(temp);
-                kelvin = celsiusToKelvin(temp);
-                formulaText.innerHTML = '°F = (°C × 9/5) + 32 | K = °C + 273.15';
+                formulaText.innerHTML = '°F = (°C × 9/5) + 32';
             } else if (unit === 'fahrenheit') {
                 celsius = fahrenheitToCelsius(temp);
                 fahrenheit = temp;
-                kelvin = fahrenheitToKelvin(temp);
-                formulaText.innerHTML = '°C = (°F - 32) × 5/9 | K = (°F - 32) × 5/9 + 273.15';
-            } else if (unit === 'kelvin') {
-                celsius = kelvinToCelsius(temp);
-                fahrenheit = kelvinToFahrenheit(temp);
-                kelvin = temp;
-                formulaText.innerHTML = '°C = K - 273.15 | °F = (K - 273.15) × 9/5 + 32';
+                formulaText.innerHTML = '°C = (°F - 32) × 5/9';
             }
 
             // Validate absolute zero
@@ -687,7 +646,6 @@
             // Update results
             document.getElementById('celsiusValue').textContent = celsius.toFixed(2);
             document.getElementById('fahrenheitValue').textContent = fahrenheit.toFixed(2);
-            document.getElementById('kelvinValue').textContent = kelvin.toFixed(2);
 
             // Update temperature reference
             const reference = getTemperatureReference(celsius);
