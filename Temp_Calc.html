@@ -626,11 +626,11 @@
             if (unit === 'celsius') {
                 celsius = temp;
                 fahrenheit = celsiusToFahrenheit(temp);
-                formulaText.innerHTML = '°F = (°C × 9/5) + 32';
+                formulaText.innerHTML = `Converting from Celsius to Fahrenheit:<br>°F = (°C × 9/5) + 32 = (${temp.toFixed(1)} × 9/5) + 32 = <strong>${fahrenheit.toFixed(2)}°F</strong>`;
             } else if (unit === 'fahrenheit') {
                 celsius = fahrenheitToCelsius(temp);
                 fahrenheit = temp;
-                formulaText.innerHTML = '°C = (°F - 32) × 5/9';
+                formulaText.innerHTML = `Converting from Fahrenheit to Celsius:<br>°C = (°F - 32) × 5/9 = (${temp.toFixed(1)} - 32) × 5/9 = <strong>${celsius.toFixed(2)}°C</strong>`;
             }
 
             // Validate absolute zero
