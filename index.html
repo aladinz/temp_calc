@@ -276,7 +276,7 @@
             background: linear-gradient(to right, #3498db, #2ecc71, #f39c12, #e74c3c);
             border-radius: 15px;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
         .scale-marker {
             position: absolute;
@@ -288,6 +288,44 @@
             border-radius: 2px;
             transition: left 0.5s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        .landmark {
+            position: absolute;
+            top: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .landmark:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+        .landmark-marker {
+            width: 3px;
+            height: 40px;
+            background: white;
+            border: 2px solid var(--text-primary);
+            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+        .landmark-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--container-bg);
+            padding: 3px 6px;
+            border-radius: 5px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        .landmark-icon {
+            font-size: 1rem;
+            margin-bottom: 2px;
         }
         .formula-box {
             margin-top: 15px;
@@ -491,6 +529,16 @@
             .scale-indicator {
                 padding: 12px;
             }
+            .landmark-label {
+                font-size: 0.6rem;
+                padding: 2px 4px;
+            }
+            .landmark-icon {
+                font-size: 0.85rem;
+            }
+            .landmark-marker {
+                height: 35px;
+            }
             .formula-box {
                 font-size: 0.8rem;
                 padding: 10px;
@@ -610,14 +658,29 @@
         </div>
 
         <div class="scale-indicator hidden" id="scaleIndicator">
-            <div class="scale-title">Temperature Scale (°C)</div>
+            <div class="scale-title">Temperature Scale with Key Landmarks (°C)</div>
             <div class="scale-bar">
                 <div class="scale-marker" id="scaleMarker"></div>
+                <!-- Temperature Landmarks -->
+                <div class="landmark" style="left: 50%;" title="Water Freezing Point">
+                    <div class="landmark-icon">🧊</div>
+                    <div class="landmark-marker"></div>
+                    <div class="landmark-label">0°C</div>
+                </div>
+                <div class="landmark" style="left: 75%;" title="Room Temperature">
+                    <div class="landmark-icon">🏠</div>
+                    <div class="landmark-marker"></div>
+                    <div class="landmark-label">20°C</div>
+                </div>
+                <div class="landmark" style="left: 96.25%;" title="Human Body Temperature">
+                    <div class="landmark-icon">🌡️</div>
+                    <div class="landmark-marker"></div>
+                    <div class="landmark-label">37°C</div>
+                </div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-top: 5px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-top: 65px;">
                 <span>-40°C</span>
-                <span>0°C</span>
-                <span>40°C</span>
+                <span>100°C Boil 💧</span>
             </div>
         </div>
 
